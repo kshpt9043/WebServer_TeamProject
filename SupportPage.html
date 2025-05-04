@@ -1,0 +1,37 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <meta charset="UTF-8">
+        <link rel="stylesheet" href="common.css">
+    </head>
+    <body>
+        <div id="header-placeholder"></div>
+
+        <script>
+            fetch('header.html')
+              .then(res => res.text())
+              .then(data => {
+                document.getElementById('header-placeholder').innerHTML = data;
+        
+                const input = document.getElementById('search-input');
+                if (input) {
+                  input.addEventListener('keypress', function (e) {
+                    if (e.key === 'Enter') {
+                      submitSearch();
+                    }
+                  });
+                }
+        
+              });
+        
+            function submitSearch() {
+              const query = document.getElementById('search-input').value.trim();
+              if (query) {
+                window.location.href = 'search.html?q=' + encodeURIComponent(query);
+              } else {
+                alert('검색어를 입력하세요!');
+              }
+            }
+          </script>
+    </body>
+</html>

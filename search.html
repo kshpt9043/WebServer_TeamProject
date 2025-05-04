@@ -1,0 +1,24 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8">
+  <title>검색 결과</title>
+</head>
+<body>
+  <h1>검색 결과</h1>
+  <p id="search-result"></p>
+
+  <script>
+    // URL에서 쿼리 파라미터 추출
+    const params = new URLSearchParams(window.location.search);
+    const query = params.get('q');
+
+    // 결과 표시
+    if (query) {
+      document.getElementById('search-result').textContent = `"${query}"에 대한 검색 결과입니다.`;
+    } else {
+      document.getElementById('search-result').textContent = '검색어가 없습니다.';
+    }
+  </script>
+</body>
+</html>

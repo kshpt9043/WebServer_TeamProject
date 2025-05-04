@@ -1,0 +1,128 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <meta charset="UTF-8">
+        <link rel="stylesheet" href="common.css">
+    </head>
+    <body>
+        <div id="header-placeholder"></div>
+
+        <script>
+            fetch('header.html')
+              .then(res => res.text())
+              .then(data => {
+                document.getElementById('header-placeholder').innerHTML = data;
+                //이거 jsp로 하면 간단할듯 데이터 다음 페이지로 넘기는거 그거임
+                const input = document.getElementById('search-input');
+                if (input) {
+                  input.addEventListener('keypress', function (e) {
+                    if (e.key === 'Enter') {
+                      submitSearch();
+                    }
+                  });
+                }
+        
+              });
+        
+            function submitSearch() {
+              const query = document.getElementById('search-input').value.trim();
+              if (query) {
+                window.location.href = 'search.html?q=' + encodeURIComponent(query);
+              } else {
+                alert('검색어를 입력하세요!');
+              }
+            }
+          </script>
+        <main style="display: flex; padding: 20px;">
+            <!-- 왼쪽 필터 영역 -->
+            <aside class="sidebar">
+              <h3>필터</h3>
+              <div class="filter-group">
+                <label><input type="checkbox" id="discountFilter"> 할인 중인 게임만</label>
+              </div>
+              <div class="filter-group">
+                <label>가격 범위:</label>
+                <select id="priceFilter">
+                  <option value="all">전체</option>
+                  <option value="0-10000">~10,000원</option>
+                  <option value="10000-30000">10,000~30,000원</option>
+                  <option value="30000+">30,000원 이상</option>
+                </select>
+              </div>
+            </aside>
+          
+            <!-- 오른쪽 게임 목록 -->
+            <section class="game-content">
+              <h2 id="category-title"></h2>
+              <div class="game-grid" id="gameList"></div>
+            </section>
+          </main>
+          
+          <script src="game-data.js"></script>
+          <script>
+            const params = new URLSearchParams(window.location.search);
+            const category = params.get('category');
+            const categoryTitle = document.getElementById('category-title');
+            categoryTitle.textContent = category ? `장르: ${category}` : '전체 게임 목록';
+          
+            const gameListContainer = document.getElementById('gameList');
+          
+            // 원본 게임 데이터 필터링
+            let filteredGames = category 
+              ? games.filter(game => game.genre === category)
+              : games;
+          
+            const discountCheckbox = document.getElementById('discountFilter');
+            const priceFilter = document.getElementById('priceFilter');
+          
+            function applyFilters() {
+              let displayGames = [...filteredGames];
+          
+              if (discountCheckbox.checked) {
+                displayGames = displayGames.filter(game => game.discount === true);
+              }
+          
+              const priceValue = priceFilter.value;
+              if (priceValue !== "all") {
+                displayGames = displayGames.filter(game => {
+                  const price = parseInt(game.price.replace(/[^\d]/g, ""));
+                  if (priceValue === "0-10000") return price <= 10000;
+                  if (priceValue === "10000-30000") return price > 10000 && price <= 30000;
+                  if (priceValue === "30000+") return price > 30000;
+                });
+              }
+          
+              renderGameCards(displayGames);
+            }
+          
+            function renderGameCards(gamesToRender) {
+              gameListContainer.innerHTML = '';
+              if (gamesToRender.length === 0) {
+                gameListContainer.innerHTML = `<p>해당 조건의 게임이 없습니다.</p>`;
+                return;
+              }
+          
+              gamesToRender.forEach(game => {
+                const card = document.createElement('a');
+                card.className = 'game-card';
+                card.href = game.link;
+          
+                card.innerHTML = `
+                  <img src="${game.image}" alt="${game.name}" class="game-image">
+                  <h3 class="game-title">${game.name}</h3>
+                  <p class="game-description">${game.price}</p>
+                `;
+          
+                gameListContainer.appendChild(card);
+              });
+            }
+          
+            discountCheckbox.addEventListener('change', applyFilters);
+            priceFilter.addEventListener('change', applyFilters);
+          
+            // 초기 렌더링
+            renderGameCards(filteredGames);
+          </script>
+        </main>
+    </body>
+</html>

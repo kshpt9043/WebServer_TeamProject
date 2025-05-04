@@ -1,0 +1,51 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="UTF-8">
+    <link rel="stylesheet" href="common.css">
+    <title>게임 상세</title>
+  </head>
+  <body>
+    <div id="header-placeholder"></div>
+    <script>
+        fetch('header.html')
+          .then(res => res.text())
+          .then(data => {
+            document.getElementById('header-placeholder').innerHTML = data;
+            //이거 jsp로 하면 간단할듯 데이터 다음 페이지로 넘기는거 그거임
+            const input = document.getElementById('search-input');
+            if (input) {
+              input.addEventListener('keypress', function (e) {
+                if (e.key === 'Enter') {
+                  submitSearch();
+                }
+              });
+            }
+    
+          });
+    
+        function submitSearch() {
+          const query = document.getElementById('search-input').value.trim();
+          if (query) {
+            window.location.href = 'search.html?q=' + encodeURIComponent(query);
+          } else {
+            alert('검색어를 입력하세요!');
+          }
+        }
+      </script>
+      <main>
+        <h1 id="game-title"></h1>
+        <div class="game-detail">
+          <img id="game-image" src="" alt="게임 이미지">
+          <div class="game-info">
+            <p id="game-description"></p>
+          </div>
+        </div>
+        <script src="game-data.js"></script>
+        <script src="detail.js"></script>
+        <div>
+          <button>구매</button>
+        </div>
+      </main>
+  </body>
+</html>

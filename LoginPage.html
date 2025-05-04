@@ -1,0 +1,71 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="UTF-8">
+  <link rel="stylesheet" href="common.css">
+  <title>로그인</title>
+</head>
+<body>
+  <div id="header-placeholder"></div>
+
+  <script>
+    fetch('header.html')
+      .then(res => res.text())
+      .then(data => {
+        document.getElementById('header-placeholder').innerHTML = data;
+        const input = document.getElementById('search-input');
+        if (input) {
+          input.addEventListener('keypress', function (e) {
+            if (e.key === 'Enter') {
+              submitSearch();
+            }
+          });
+        }
+      });
+
+    function submitSearch() {
+      const query = document.getElementById('search-input').value.trim();
+      if (query) {
+        window.location.href = 'search.html?q=' + encodeURIComponent(query);
+      } else {
+        alert('검색어를 입력하세요!');
+      }
+    }
+  </script>
+
+  <main class="login-wrapper">
+    <div class="login-box">
+      <div class="login-ID">
+        <input type="text" id="login-id" placeholder="ID 입력" />
+      </div>
+      <div class="login-PW">
+        <input type="password" id="login-pw" placeholder="비밀번호 입력" />
+      </div>
+      <button onclick="login()">로그인</button>
+      <div class="login-links">
+        <div class="register">
+          <a href="#">회원 가입</a>
+        </div>
+        <div class="forget-PW">
+          <a href="#">비밀번호 찾기</a>
+        </div>
+      </div>
+    </div>
+  </main>
+
+  <script>
+    function login() {
+      const id = document.getElementById('login-id').value.trim();
+      const pw = document.getElementById('login-pw').value.trim();
+
+      if (id === 'admin' && pw === 'admin') {
+        // 로그인 성공 시 이동
+        window.location.href = 'MainPage.html';
+        // 임시용 admin, 로그인되고 나서 우측상단 바뀌는건 연동 후에 해야할듯
+      } else {
+        alert('ID 또는 비밀번호가 올바르지 않습니다.');
+      }
+    }
+  </script>
+</body>
+</html>

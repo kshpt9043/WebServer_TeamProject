@@ -1,0 +1,27 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <meta charset="UTF-8">
+        <link rel="stylesheet" href="common.css">
+    </head>
+    <body>
+        <div id="header-placeholder"></div>
+
+        <script>
+            fetch('header.html')
+            .then(res => res.text())
+            .then(data => {
+                document.getElementById('header-placeholder').innerHTML = data;
+            });
+        </script>
+        <main>
+            <!--로그인 안되어있을땐 로그인 하라고 알려주고 로그인 창으로-->
+            <div>
+                <script>
+                    alert("로그인이 필요합니다.");
+                    window.location.href = "LoginPage.html";
+                </script>
+            </div>
+        </main>
+    </body>
+</html>

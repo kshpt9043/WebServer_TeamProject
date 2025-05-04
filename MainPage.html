@@ -1,0 +1,57 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <meta charset="UTF-8">
+        <link rel="stylesheet" href="common.css">
+    </head>
+    <body>
+        <div id="header-placeholder"></div>
+
+        <script>
+            fetch('header.html')
+              .then(res => res.text())
+              .then(data => {
+                document.getElementById('header-placeholder').innerHTML = data;
+                //이거 jsp로 하면 간단할듯 데이터 다음 페이지로 넘기는거 그거임
+                const input = document.getElementById('search-input');
+                if (input) {
+                  input.addEventListener('keypress', function (e) {
+                    if (e.key === 'Enter') {
+                      submitSearch();
+                    }
+                  });
+                }
+        
+              });
+        
+            function submitSearch() {
+              const query = document.getElementById('search-input').value.trim();
+              if (query) {
+                window.location.href = 'search.html?q=' + encodeURIComponent(query);
+              } else {
+                alert('검색어를 입력하세요!');
+              }
+            }
+          </script>
+        <main>
+            <div class="main-banner">인기 게임?</div>
+            <div class="game-grid" id="gameGrid"></div>
+
+              <script src="game-data.js"></script>
+              <script>
+                const grid = document.getElementById('gameGrid');
+
+                games.forEach(game => {
+                  const card = document.createElement('a');
+                  card.href = game.link;
+                  card.className = 'game-card';
+                  card.innerHTML = `
+                    <img src="${game.image}" alt="${game.name}">
+                    <p>${game.name}</p>
+                  `;
+                  grid.appendChild(card);
+                });
+              </script>
+        </main>
+    </body>
+</html>
