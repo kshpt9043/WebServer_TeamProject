@@ -1,0 +1,57 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="UTF-8">
+  <title>내 라이브러리</title>
+  <link rel="stylesheet" href="common.css">
+</head>
+<body>
+  <div id="header-placeholder"></div>
+
+  <script>
+    fetch('header.html')
+      .then(res => res.text())
+      .then(data => {
+        document.getElementById('header-placeholder').innerHTML = data;
+        const script = document.createElement('script');
+        script.src = 'header-login-status.js';
+        document.body.appendChild(script);
+
+        const currentUser = localStorage.getItem('currentUser');
+        if (!currentUser) {
+          alert("로그인이 필요합니다.");
+          window.location.href = "LoginPage.html";
+        } else {
+          loadLibrary(currentUser);
+        }
+      });
+
+    function loadLibrary(userId) {
+      const purchases = JSON.parse(localStorage.getItem(`library_${userId}`) || '[]');
+      const container = document.getElementById('library-container');
+
+      if (purchases.length === 0) {
+        container.innerHTML = "<p>보유한 게임이 없습니다.</p>";
+        return;
+      }
+
+      let html = "<div class='game-grid'>";
+      purchases.forEach(game => {
+        html += `
+          <div class="game-card">
+            <img src="${game.image}" alt="${game.name}">
+            <p>${game.name}</p>
+          </div>
+        `;
+      });
+      html += "</div>";
+      container.innerHTML = html;
+    }
+  </script>
+
+  <main>
+    <h2>내 라이브러리</h2>
+    <div id="library-container"></div>
+  </main>
+</body>
+</html>

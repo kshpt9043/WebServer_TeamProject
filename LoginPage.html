@@ -10,18 +10,15 @@
 
   <script>
     fetch('header.html')
-      .then(res => res.text())
-      .then(data => {
-        document.getElementById('header-placeholder').innerHTML = data;
-        const input = document.getElementById('search-input');
-        if (input) {
-          input.addEventListener('keypress', function (e) {
-            if (e.key === 'Enter') {
-              submitSearch();
-            }
-          });
-        }
-      });
+              .then(res => res.text())
+              .then(data => {
+                document.getElementById('header-placeholder').innerHTML = data;
+
+                // 여기서 로그인 상태 체크 JS 실행
+                const script = document.createElement('script');
+                script.src = 'header-login-status.js'; // ✅ 위에서 만든 파일
+                document.body.appendChild(script);
+              });
 
     function submitSearch() {
       const query = document.getElementById('search-input').value.trim();
@@ -44,7 +41,7 @@
       <button onclick="login()">로그인</button>
       <div class="login-links">
         <div class="register">
-          <a href="#">회원 가입</a>
+          <a href="RegisterPage.html">회원 가입</a>
         </div>
         <div class="forget-PW">
           <a href="#">비밀번호 찾기</a>
@@ -54,18 +51,37 @@
   </main>
 
   <script>
-    function login() {
-      const id = document.getElementById('login-id').value.trim();
-      const pw = document.getElementById('login-pw').value.trim();
-
-      if (id === 'admin' && pw === 'admin') {
-        // 로그인 성공 시 이동
-        window.location.href = 'MainPage.html';
-        // 임시용 admin, 로그인되고 나서 우측상단 바뀌는건 연동 후에 해야할듯
-      } else {
-        alert('ID 또는 비밀번호가 올바르지 않습니다.');
-      }
+  function submitSearch() {
+    const query = document.getElementById('search-input').value.trim();
+    if (query) {
+      window.location.href = 'search.html?q=' + encodeURIComponent(query);
+    } else {
+      alert('검색어를 입력하세요!');
     }
-  </script>
+  }
+
+  function login() {
+    const id = document.getElementById('login-id').value.trim();
+    const pw = document.getElementById('login-pw').value.trim();
+
+    // 1. localStorage에서 사용자 목록 가져오기
+    const users = JSON.parse(localStorage.getItem('users') || '[]');
+
+    // 2. admin / admin 허용
+    const isAdmin = id === 'admin' && pw === 'admin';
+
+    // 3. 회원가입 사용자 확인
+    const matchedUser = users.find(user => user.id === id && user.password === pw);
+
+    if (isAdmin || matchedUser) {
+      localStorage.setItem('currentUser', id); 
+      alert(`"${id}"님 환영합니다.`);
+      window.location.href = 'MainPage.html';
+    } else {
+      alert('ID 또는 비밀번호가 올바르지 않습니다.');
+    }
+  }
+</script>
+
 </body>
 </html>

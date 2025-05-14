@@ -319,3 +319,26 @@ body {
 .game-content {
   flex: 1;
 }
+
+.rating-stars {
+  margin-top: 16px;
+  font-size: 20px;
+  color: 2c2c2c;
+}
+
+.game-price {
+  margin-top: 10px;
+  font-size: 18px;
+  font-weight: bold;
+}
+
+.buy-button {
+  margin-top: 16px;
+  padding: 12px 20px;
+  background-color: #ff6b00;
+  color: white;
+  border: none;
+  border-radius: 6px;
+  cursor: pointer;
+  font-size: 16px;
+}

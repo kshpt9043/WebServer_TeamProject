@@ -12,16 +12,11 @@
               .then(res => res.text())
               .then(data => {
                 document.getElementById('header-placeholder').innerHTML = data;
-                //이거 jsp로 하면 간단할듯 데이터 다음 페이지로 넘기는거 그거임
-                const input = document.getElementById('search-input');
-                if (input) {
-                  input.addEventListener('keypress', function (e) {
-                    if (e.key === 'Enter') {
-                      submitSearch();
-                    }
-                  });
-                }
-        
+
+                // 여기서 로그인 상태 체크 JS 실행
+                const script = document.createElement('script');
+                script.src = 'header-login-status.js'; // ✅ 위에서 만든 파일
+                document.body.appendChild(script);
               });
         
             function submitSearch() {

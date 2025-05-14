@@ -1,27 +1,129 @@
 <!DOCTYPE html>
 <html>
-    <head>
-        <meta charset="UTF-8">
-        <link rel="stylesheet" href="common.css">
-    </head>
-    <body>
-        <div id="header-placeholder"></div>
+<head>
+  <meta charset="UTF-8">
+  <title>장바구니</title>
+  <link rel="stylesheet" href="common.css">
+  <style>
+    .action-buttons {
+      margin-top: 16px;
+    }
+    .action-buttons button {
+      margin-right: 12px;
+      background-color: #ff6b00;
+      color: white;
+      border: none;
+      padding: 10px 16px;
+      border-radius: 6px;
+      cursor: pointer;
+    }
+    .action-buttons button:hover {
+      background-color: #e85e00;
+    }
+  </style>
+</head>
+<body>
+  <div id="header-placeholder"></div>
 
-        <script>
-            fetch('header.html')
-            .then(res => res.text())
-            .then(data => {
-                document.getElementById('header-placeholder').innerHTML = data;
-            });
-        </script>
-        <main>
-            <!--로그인 안되어있을땐 로그인 하라고 알려주고 로그인 창으로-->
-            <div>
-                <script>
-                    alert("로그인이 필요합니다.");
-                    window.location.href = "LoginPage.html";
-                </script>
-            </div>
-        </main>
-    </body>
+  <script src="game-data.js"></script>
+  <script>
+    fetch('header.html')
+      .then(res => res.text())
+      .then(data => {
+        document.getElementById('header-placeholder').innerHTML = data;
+        const script = document.createElement('script');
+        script.src = 'header-login-status.js';
+        document.body.appendChild(script);
+
+        const currentUser = localStorage.getItem('currentUser');
+        if (!currentUser) {
+          alert("로그인이 필요합니다.");
+          window.location.href = "LoginPage.html";
+        } else {
+          loadCart(currentUser);
+        }
+      });
+
+    function loadCart(userId) {
+      const cartItems = JSON.parse(localStorage.getItem(`cart_${userId}`) || '[]');
+      const container = document.getElementById('cart-container');
+
+      if (cartItems.length === 0) {
+        container.innerHTML = "<p>장바구니가 비어 있습니다.</p>";
+        return;
+      }
+
+      let html = "<form id='cart-form'><ul>";
+      let total = 0;
+
+      cartItems.forEach((item) => {
+        html += `
+          <li>
+            <input type="checkbox" name="remove" value="${item.id}" />
+            ${item.name} - ${item.price}원
+          </li>`;
+        total += parseInt(item.price.replace(/[^\d]/g, ""));
+      });
+
+      html += "</ul></form>";
+      html += `<p><strong>총 금액: ${total.toLocaleString()}원</strong></p>`;
+      html += `
+        <div class="action-buttons">
+          <button type="button" onclick="removeSelectedItems(event)">선택 항목 삭제</button>
+          <button type="button" onclick="proceedToPayment()">결제하기</button>
+          <button type="button" onclick="goToLibrary()">마이페이지</button>
+        </div>`;
+      container.innerHTML = html;
+    }
+
+    function removeSelectedItems(event) {
+      if (event) event.preventDefault();
+
+      const currentUser = localStorage.getItem('currentUser');
+      if (!currentUser) return;
+
+      const checked = [...document.querySelectorAll('#cart-form input[name="remove"]:checked')]
+        .map(input => input.value);
+
+      if (checked.length === 0) {
+        alert("삭제할 항목을 선택하세요.");
+        return;
+      }
+
+      let cart = JSON.parse(localStorage.getItem(`cart_${currentUser}`) || '[]');
+      cart = cart.filter(item => !checked.includes(item.id));
+      localStorage.setItem(`cart_${currentUser}`, JSON.stringify(cart));
+
+      loadCart(currentUser);
+    }
+
+    function proceedToPayment() {
+      const currentUser = localStorage.getItem('currentUser');
+      if (!currentUser) return;
+
+      const cart = JSON.parse(localStorage.getItem(`cart_${currentUser}`) || '[]');
+      let library = JSON.parse(localStorage.getItem(`library_${currentUser}`) || '[]');
+
+      cart.forEach(item => {
+        if (!library.some(g => g.id === item.id)) {
+          const fullData = games.find(g => g.id === item.id);
+          if (fullData) library.push(fullData); // ✅ image 포함 전체 정보 저장
+        }
+      });
+
+      localStorage.setItem(`library_${currentUser}`, JSON.stringify(library));
+      localStorage.removeItem(`cart_${currentUser}`);
+      window.location.href = 'PaymentPage.html';
+    }
+
+    function goToLibrary() {
+      window.location.href = 'LibraryPage.html';
+    }
+  </script>
+
+  <main>
+    <h2>장바구니</h2>
+    <div id="cart-container"></div>
+  </main>
+</body>
 </html>
