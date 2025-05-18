@@ -4,6 +4,29 @@
   <meta charset="UTF-8">
   <title>내 라이브러리</title>
   <link rel="stylesheet" href="common.css">
+  <style>
+    .star-rating {
+      display: flex;
+      gap: 5px;
+      margin-top: 5px;
+    }
+    .star-rating button {
+      background: none;
+      border: none;
+      font-size: 20px;
+      cursor: pointer;
+      color: gold;
+    }
+    .rating-message {
+      font-size: 14px;
+      color: #ccc;
+      margin-top: 4px;
+    }
+    .game-card a {
+      text-decoration: none;
+      color: inherit;
+    }
+  </style>
 </head>
 <body>
   <div id="header-placeholder"></div>
@@ -28,6 +51,7 @@
 
     function loadLibrary(userId) {
       const purchases = JSON.parse(localStorage.getItem(`library_${userId}`) || '[]');
+      const ratings = JSON.parse(localStorage.getItem(`ratings_${userId}`) || '{}');
       const container = document.getElementById('library-container');
 
       if (purchases.length === 0) {
@@ -37,15 +61,37 @@
 
       let html = "<div class='game-grid'>";
       purchases.forEach(game => {
+        const imagePath = game.image;
+        const savedRating = ratings[game.id] || 0;
+
         html += `
           <div class="game-card">
-            <img src="${game.image}" alt="${game.name}">
-            <p>${game.name}</p>
+            <a href="Game_Detail.html?id=${game.id}">
+              <img src="${imagePath}" alt="${game.name}">
+              <p>${game.name}</p>
+            </a>
+            <div class="star-rating" data-id="${game.id}">
+              ${[1, 2, 3, 4, 5].map(i => `<button data-star="${i}">${i <= savedRating ? '★' : '☆'}</button>`).join('')}
+            </div>
+            <div class="rating-message">${savedRating ? `평점: ${savedRating}점` : '아직 평점 없음'}</div>
           </div>
         `;
       });
       html += "</div>";
       container.innerHTML = html;
+
+      document.querySelectorAll('.star-rating button').forEach(button => {
+        button.addEventListener('click', function (e) {
+          e.preventDefault(); // 링크 클릭 방지
+          const star = parseInt(this.dataset.star);
+          const gameId = this.parentElement.dataset.id;
+
+          const ratings = JSON.parse(localStorage.getItem(`ratings_${userId}`) || '{}');
+          ratings[gameId] = star;
+          localStorage.setItem(`ratings_${userId}`, JSON.stringify(ratings));
+          loadLibrary(userId);
+        });
+      });
     }
   </script>
 
